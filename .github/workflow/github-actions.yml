@@ -1,0 +1,31 @@
+name: GitHub Action Learning
+
+on: [push]
+
+jobs:
+  learning:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        python-version: ['3.12']
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Check Python version
+        run: python -c "import sys; print(sys.version)"
+
+      - name: install requirements
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Test with pytest
+        run: |
+          pip install pytest pytest-cov
+          pytest tests/tests.py --doctest-modules --junitxml=junit/test-results.xml --cov=com --cov-report=xml --cov-report=html
