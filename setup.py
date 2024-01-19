@@ -3,10 +3,10 @@ from setuptools import setup, find_packages
 from pip._internal.req import parse_requirements
 
 CURRENT_PATH = os.path.dirname(__file__)
-
+REQUIREMENTS_TEXT_PATH = os.path.join(CURRENT_PATH, 'requirements.txt')
 
 def load_requirements():
-    return [str(r.requirement) for r in parse_requirements('requirements.txt', '')]
+    return [str(r.requirement) for r in parse_requirements(REQUIREMENTS_TEXT_PATH, 'test')]
 
 
 def load_long_description():
