@@ -1,28 +1,24 @@
 name: GitHub Action Learning
 
-on: [push]
+on: [ push ]
 
 jobs:
-  learning:
+  build:
     runs-on: windows-latest
-    strategy:
-      matrix:
-        python-version: ['3.12']
-
     steps:
       - uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: '3.12'
 
       - name: Check Python version
         run: python -c "import sys; print(sys.version)"
 
       - name: install requirements
         run: |
-          python -m pip install --upgrade pip build
+          python -m pip install --upgrade pip setuptools wheel twine
           pip install -r requirements.txt
 
       - name: Test with pytest
@@ -31,17 +27,86 @@ jobs:
           pytest tests/tests.py --doctest-modules --junitxml=junit/test-results.xml --cov=com --cov-report=xml --cov-report=html
 
       - name: Upload pytest results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4.2.0
         if: ${{ always() }}
         with:
-          name: pytest-results-${{ matrix.python-version }}
+          name: pytest-results
           path: junit/test-results.xml
 
       - name: Build package
-        run: python -m build
+        run: python setup.py sdist bdist_wheel
 
-      - name: Publish package
-        uses: pypa/gh-action-pypi-publish@v1.8.11
+      - name: Store the distribution packages
+        uses: actions/upload-artifact@v4.2.0
         with:
-          user: __TOKEN_GITHUB_ACTIONS__
-          password: ${{ secrets.PYPI_API_TOKEN }}
+          name: python-package-distributions
+          path: dist/
+
+  publish-to-pypi:
+    name: Publish to pypi
+    # only publish to PyPI on tag pushes
+    if: startsWith(github.ref, 'refs/tags/')
+    needs:
+      - build
+    runs-on: windows-latest
+    permissions:
+      id-token: write
+
+    steps:
+      - name: Download the stored distribution packages
+        uses: actions/download-artifact@v4.1.1
+        with:
+          name: python-package-distributions
+          path: dist/
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+
+      - name: install requirements
+        run: |
+          python -m pip install --upgrade twine
+
+      - name: Publish distribution packages to PyPI
+        shell: cmd
+        env:
+          repository: https://pypi.org/p/ty_python_learning
+          username: __token__
+          pwd: ${{ secrets.__TOKEN_GITHUB_ACTIONS__ }}
+        run: |
+          python -m twine upload --repository %repository% -u %username% -p %pwd% dist/*
+
+
+  release-to-github:
+    name: release the python packages to github
+    # only publish to PyPI on tag pushes
+    if: startsWith(github.ref, 'refs/tags/')
+    needs:
+    - build
+    runs-on: windows-latest
+    permissions:
+      contents: write
+      id-token: write
+
+    steps:
+      - name: Download the stored distribution packages
+        uses: actions/download-artifact@v4.1.1
+        with:
+          name: python-package-distributions
+          path: dist/
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete "v0.0.1" -y --cleanup-tag --repo "${{ github.repository }}"
+          gh release create "v0.0.1" --repo "${{ github.repository }}" --notes "test"
+
+      - name: Upload artifact signatures to GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: >-
+          gh release upload
+          "v0.0.1" (get-item dist/*)
+          --repo '${{ github.repository }}'
