@@ -5,9 +5,6 @@ on: [push]
 jobs:
   learning:
     runs-on: windows-latest
-    strategy:
-      matrix:
-        python-version: ['3.12']
 
     steps:
       - uses: actions/checkout@v4
@@ -34,7 +31,7 @@ jobs:
         uses: actions/upload-artifact@v3
         if: ${{ always() }}
         with:
-          name: pytest-results-${{ matrix.python-version }}
+          name: pytest-results
           path: junit/test-results.xml
 
       - name: Build package
