@@ -29,3 +29,19 @@ jobs:
         run: |
           pip install pytest pytest-cov
           pytest tests/tests.py --doctest-modules --junitxml=junit/test-results.xml --cov=com --cov-report=xml --cov-report=html
+
+      - name: Upload pytest results
+        uses: actions/upload-artifact@v3
+        with:
+          name: pytest-results-${{ matrix.python-version }}
+          path: junit/test-results.xml
+          if: ${{ always() }}
+
+      - name: Build package
+        run: python -m build
+
+      - name: Publish package
+        uses: pypa/gh-action-pypi-publish@v1
+        with:
+          user: __TOKEN_GITHUB_ACTIONS__
+          password: ${{ secrets.PYPI_API_TOKEN }}
