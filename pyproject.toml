@@ -1,16 +1,21 @@
 [build-system]
-requires = ["setuptools"]
+requires = [
+    "setuptools",
+    "some_build_toolkit",
+]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "typythonlearning"
-version = "0.0.1"
+description = 'python learning'
+dependencies = { file = 'requirements.txt', content-type = "text" }
+version = []
 authors = [
     { name = "youth_ty", email = "youth_ty@163.com" },
 ]
 maintainers = [
 ]
-readme = "README.md"
+readme = { file = "README.txt", content-type = "text/markdown" }
 requires-python = ">=3.9.6"
 classifiers = [
     "Programming Language :: Python :: 3",

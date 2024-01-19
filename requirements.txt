@@ -1,5 +1,3 @@
 paramiko
 requests
 jsonpath
-pytest
-pytest-cov
