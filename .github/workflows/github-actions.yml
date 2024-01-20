@@ -64,9 +64,6 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Check Python version
-        run: python -c "import sys; print(sys.version)"
-
       - name: install requirements
         run: |
           python -m pip install --upgrade twine
@@ -84,7 +81,7 @@ jobs:
   release-to-github:
     name: release the python packages to github
     needs:
-      - build
+    - build
     runs-on: windows-latest
     permissions:
       contents: write
@@ -97,9 +94,22 @@ jobs:
           name: python-package-distributions
           path: dist/
 
+      - name: Check dist files
+        shell: cmd
+        run:
+          dir dist/
+
       - name: Create GitHub Release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release delete "v0.0.1" -y --cleanup-tag
-          gh release create "v0.0.1" dist/*.whl dist/*.tar.gz --repo '${{ github.repository }}' --notes "test"
+          gh release delete "v0.0.1" -y --cleanup-tag --repo "${{ github.repository }}"
+          gh release create "v0.0.1" --repo "${{ github.repository }}" --notes "test"
+
+      - name: Upload artifact signatures to GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: >-
+          gh release upload
+          "v0.0.1" dist/*
+          --repo '${{ github.repository }}'
