@@ -39,7 +39,7 @@ jobs:
       - name: Store the distribution packages
         uses: actions/upload-artifact@v4.2.0
         with:
-          name: python-packages-distributions
+          name: python-package-distributions
           path: dist/
 
   publish-to-pypi:
@@ -57,7 +57,7 @@ jobs:
       - name: Download the Stored distribution packages
         uses: actions/download-artifact@v3
         with:
-          name: python-packages-distributions
+          name: python-package-distributions
           path: dist/
 
       - name: Publish distribution packages to PyPI
