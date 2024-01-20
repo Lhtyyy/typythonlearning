@@ -74,9 +74,9 @@ jobs:
 
       - name: Publish distribution packages to PyPI
         shell: cmd
-        run: |
-          python -m twine upload dist/*
-        with:
+        env:
           repository: pypi
-          u: __token__
-          p: ${{ secrets.__TOKEN_GITHUB_ACTIONS__ }}
+          username: __token__
+          pwd: ${{ secrets.__TOKEN_GITHUB_ACTIONS__ }}
+        run: |
+          python -m twine upload --repository %repository% -u %username% -p %pwd% dist/*
