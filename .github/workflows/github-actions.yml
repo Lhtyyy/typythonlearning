@@ -34,7 +34,7 @@ jobs:
           path: junit/test-results.xml
 
       - name: Build package
-        run: python setup.py sdist bdist_wheel
+        run: python setup.py sdist bdist_wheel twine
 
       - name: Store the distribution packages
         uses: actions/upload-artifact@v4.2.0
