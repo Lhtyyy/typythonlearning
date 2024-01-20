@@ -45,13 +45,10 @@ jobs:
   publish-to-pypi:
     name: Publish to pypi
     # only publish to PyPI on tag pushes
-#    if: startsWith(github.ref, 'refs/tags/')
+    if: startsWith(github.ref, 'refs/tags/')
     needs:
       - build
     runs-on: windows-latest
-    environment:
-      name: pypi
-      url: https://pypi.org/p/ty_python_learning
     permissions:
       id-token: write
 
@@ -77,11 +74,11 @@ jobs:
       - name: Publish distribution packages to PyPI
         shell: cmd
         env:
-          repository: pypi
+          repository: https://pypi.org/p/ty_python_learning
           username: __token__
           pwd: ${{ secrets.__TOKEN_GITHUB_ACTIONS__ }}
         run: |
-          python -m twine upload --repository %repository% --skip-existing -u %username% -p %pwd% dist/*
+          python -m twine upload --repository %repository% -u %username% -p %pwd% dist/*
 
 
   release-to-github:
@@ -111,7 +108,18 @@ jobs:
         env:
           GIT_HUB_TOKEN: ${{ github.token }}
         run: >-
-          gh release create          
-          '${{ github.ref_name }}' dist/**
+          gh release create
+          '${{ github.ref_name }}'
           --repo '${{ github.repository }}'
           --notes ""
+
+      - name: Upload artifact signatures to GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        # Upload to GitHub Release using the `gh` CLI.
+        # `dist/` contains the built packages, and the
+        # sigstore-produced signatures and certificates.
+        run: >-
+          gh release upload
+          '${{ github.ref_name }}' dist/**
+          --repo '${{ github.repository }}'
