@@ -11,7 +11,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: '3.12'
 
       - name: Check Python version
         run: python -c "import sys; print(sys.version)"
@@ -57,7 +57,7 @@ jobs:
       - name: Download the Stored distribution packages
         uses: actions/download-artifact@v3
         with:
-          name: python-package-distributions
+          name: python-packages-distributions
           path: dist/
 
       - name: Publish distribution packages to PyPI
