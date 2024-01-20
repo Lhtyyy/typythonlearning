@@ -75,7 +75,8 @@ jobs:
       - name: Publish distribution packages to PyPI
         shell: cmd
         run: |
-          echo [pypi] > %USERPROFILE%/.pypirc
-          echo   username = __token__ > %USERPROFILE%/.pypirc
-          echo   password = ${{ secrets.__TOKEN_GITHUB_ACTIONS__ }} > %USERPROFILE%/.pypirc
-          python -m twine upload --repository pypi dist/*
+          python -m twine upload dist/*
+        with:
+          repository: pypi
+          u: __token__
+          p: ${{ secrets.__TOKEN_GITHUB_ACTIONS__ }}
