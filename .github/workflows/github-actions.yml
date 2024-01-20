@@ -94,11 +94,6 @@ jobs:
           name: python-package-distributions
           path: dist/
 
-      - name: Check dist files
-        shell: cmd
-        run:
-          dir dist/
-
       - name: Create GitHub Release
         env:
           GH_TOKEN: ${{ github.token }}
