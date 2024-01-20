@@ -49,7 +49,7 @@ jobs:
     runs-on: windows-latest
     environment:
       name: pypi
-      url: https://upload.pypi.org/legacy/
+      url: https://pypi.org/p/ty_python_learning
     permissions:
       id-token: write
 
