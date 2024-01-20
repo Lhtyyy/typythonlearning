@@ -100,8 +100,6 @@ jobs:
       - name: Create GitHub Release
         env:
           GH_TOKEN: ${{ github.token }}
-        run: >-
-          gh release create
-          "v0.0.1" dist/*
-          --repo '${{ github.repository }}'
-          --notes "test"
+        run: |
+          gh release delete "v0.0.1" -y --cleanup-tag
+          gh release create "v0.0.1" dist/*.whl dist/*.tar.gz --repo '${{ github.repository }}' --notes "test"
