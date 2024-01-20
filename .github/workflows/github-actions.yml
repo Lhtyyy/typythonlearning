@@ -3,9 +3,8 @@ name: GitHub Action Learning
 on: [push]
 
 jobs:
-  learning:
+  build:
     runs-on: windows-latest
-
     steps:
       - uses: actions/checkout@v4
 
@@ -37,8 +36,29 @@ jobs:
       - name: Build package
         run: python setup.py sdist bdist_wheel
 
-      - name: Publish package
-        uses: pypa/gh-action-pypi-publish@v1.8.11
+      - name: Store the distribution packages
+        uses: actions/upload-artifact@v4.2.0
         with:
-          user: __TOKEN_GITHUB_ACTIONS__
-          password: ${{ secrets.PYPI_API_TOKEN }}
+          name: python-packages-distributions
+          path: dist/
+
+  publish-to-pypi:
+    name: Publish to pypi
+    needs:
+      - build
+    runs-on: windows-latest
+    environment:
+      name: pypi
+      url: https://upload.pypi.org/legacy/
+    permissions:
+      id-token: write
+
+    steps:
+      - name: Download the Stored distribution packages
+        uses: actions/download-artifact@v3
+        with:
+          name: python-package-distributions
+          path: dist/
+
+      - name: Publish distribution packages to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
