@@ -1,6 +1,6 @@
 name: GitHub Action Learning
 
-on: [push]
+on: [ push ]
 
 jobs:
   build:
@@ -54,7 +54,7 @@ jobs:
       id-token: write
 
     steps:
-      - name: Download the Stored distribution packages
+      - name: Download the stored distribution packages
         uses: actions/download-artifact@v4.1.1
         with:
           name: python-package-distributions
@@ -80,3 +80,43 @@ jobs:
           pwd: ${{ secrets.__TOKEN_GITHUB_ACTIONS__ }}
         run: |
           python -m twine upload --repository %repository% -u %username% -p %pwd% dist/*
+
+
+  release-to-github:
+    name: release the python packages to github
+    needs:
+      - build
+    runs-on: windows-latest
+    permissions:
+      contents: write
+      id-token: write
+
+    steps:
+      - name: Download the stored distribution packages
+        uses: actions/download-artifact@v4.1.1
+        with:
+          name: python-package-distributions
+          path: dist/
+
+      - name: Sign the dists with Sigstore
+        uses: sigstore/gh-action-sigstore-python@v2.1.1
+        with:
+          inputs: >-
+            ./dist/*.tar.gz
+            ./dist/*.whl
+
+      - name: Create GitHub Release
+        env:
+          GIT_HUB_TOKEN: ${{ github.token }}
+        run: >-
+          '${{ github.ref_name }}'
+          --repo '${{ github.repository }}'
+          --notes ""
+
+      - name: Upload artifact signatures to GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: >-
+          gh release upload
+          '${{ github.ref_name }}' dist/**
+          --repo '${{ github.repository }}'
