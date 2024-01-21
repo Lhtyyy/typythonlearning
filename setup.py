@@ -17,7 +17,7 @@ def load_long_description():
 setup(
     python_requires='>=3.9',
     name='ty-python-learning',  # 包名
-    version='0.0.1',  # 版本号
+    version='0.0.2',  # 版本号
     author='youth_ty',
     author_email='youth_ty@163.com',
     description='python learning',
