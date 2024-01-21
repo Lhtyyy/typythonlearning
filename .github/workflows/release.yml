@@ -23,8 +23,6 @@ jobs:
 
       - name: Build package
         run: |
-          pwd
-          ls -l
           python -m pip install --upgrade pip build wheel
           python -m build
 
@@ -33,6 +31,12 @@ jobs:
         with:
           name: python-package-distributions
           path: dist/
+
+      - name: Store the changelog.md
+        uses: actions/upload-artifact@v4.2.0
+        with:
+          name: changelog
+          path: changelog.md
 
   publish-to-pypi:
     name: Publish to pypi
@@ -69,6 +73,12 @@ jobs:
         with:
           name: python-package-distributions
           path: dist/
+
+      - name: Download the stored changelog
+        uses: actions/download-artifact@v4.1.1
+        with:
+          name: changelog
+          path: changelog.md
 
       - name: Create GitHub Release
         run: |
