@@ -79,6 +79,13 @@ jobs:
         with:
           name: changelog
 
+      - name: Sign the dists with Sigstore
+        uses: sigstore/gh-action-sigstore-python@v1.2.3
+        with:
+          inputs: >-
+            ./dist/*.tar.gz
+            ./dist/*.whl
+
       - name: Create GitHub Release
         run: |
           github_ref_name="${{ github.ref_name }}" && tag_name="${github_ref_name#*/}" || exit 1
@@ -89,4 +96,4 @@ jobs:
         run: >-
           github_ref_name="${{ github.ref_name }}" && tag_name="${github_ref_name#*/}" || exit 1
           echo "tag_name=${tag_name}" 
-          gh release upload "${tag_name}" dist/* --repo '${{ github.repository }}'
+          gh release upload "${tag_name}" dist/*.tar.gz dist/.whl --repo '${{ github.repository }}'
