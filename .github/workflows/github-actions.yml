@@ -106,5 +106,5 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         run: >-
           gh release upload
-          "v0.0.1" dist/*
+          "v0.0.1" (get-item dist/*)
           --repo '${{ github.repository }}'
