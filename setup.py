@@ -1,9 +1,10 @@
 import os
-from setuptools import setup, find_packages
+from setuptools import setup
 from pip._internal.req import parse_requirements
 
 CURRENT_PATH = os.path.dirname(__file__)
 REQUIREMENTS_TEXT_PATH = os.path.join(CURRENT_PATH, 'requirements.txt')
+
 
 def load_requirements():
     return [str(r.requirement) for r in parse_requirements(REQUIREMENTS_TEXT_PATH, 'test')]
@@ -15,7 +16,7 @@ def load_long_description():
 
 setup(
     python_requires='>=3.9',
-    name='ty_python_learning',  # 包名
+    name='ty-python-learning',  # 包名
     version='0.0.1',  # 版本号
     author='youth_ty',
     author_email='youth_ty@163.com',
