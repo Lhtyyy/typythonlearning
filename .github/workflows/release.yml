@@ -23,6 +23,8 @@ jobs:
 
       - name: Build package
         run: |
+          pwd
+          ls -l
           python -m pip install --upgrade pip build wheel
           python -m build
 
